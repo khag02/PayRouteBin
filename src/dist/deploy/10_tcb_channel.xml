@@ -1,0 +1,12 @@
+<channel-adaptor name='tcb-channel'>
+    <channel class="org.jpos.channel.tcb.TCBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000">
+        <property name="host" value="${bank.tcb.host}" />
+        <property name="port" value="${bank.tcb.port}" />
+        <property name="packager-config" value="cfg/napas.xml" />
+        <property name="timeout" value="60000" />
+    </channel>
+    <in>tcb-send</in>
+    <out>tcb-receive</out>
+    <keep-alive>yes</keep-alive>
+    <reconnect-delay>1000</reconnect-delay>
+</channel-adaptor>

@@ -1,0 +1,6 @@
+<mux class="org.jpos.q2.iso.QMUX" logger="Q2" name="TCB">
+    <in>tcb-receive</in>
+    <out>tcb-send</out>
+    <ready>tcb-channel.ready</ready>
+    <key>41, 11</key>
+</mux>

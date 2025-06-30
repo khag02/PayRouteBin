@@ -1,0 +1,23 @@
+<txnmgr name="paticipant" class="org.jpos.transaction.TransactionManager" logger="Q2">
+    <property name="queue" value="TXNMGR" />
+    <property name="sessions" value="1" />
+    <property name="max-sessions" value="1000" />
+    <property name="debug-context" value="false" />
+
+    <participant class="org.jpos.transaction.participant.SelectDestination">
+        <property name="request" value="REQUEST" />
+        <property name="destination" value="DESTINATION" />
+        <property name="default-destination" value="NAPAS_DEFAULT" />
+        <property name="fail" value="true" />
+        <property name="ignore-card-validations" value="false" />
+        <property name="ignore-luhn" value="false" />
+        <endpoint destination="NAPAS_VCB">411111 411120 411130..4111309999999999999</endpoint>
+        <endpoint destination="NAPAS_VIB">411113..4111139999999999999</endpoint>
+        <endpoint destination="NAPAS_TECHCOMBANK">411117..4111179999999999999</endpoint>
+        <endpoint destination="NAPAS_DEFAULT">411118..4111189999999999999</endpoint>
+        <regexp destination="NAPAS_SPECIAL">^4111[0-9]{2}.*</regexp>
+    </participant>
+
+    <participant class="org.jpos.transaction.participant.QueryHost"/>
+    <participant class="org.jpos.transaction.participant.SendResponse"/>
+</txnmgr>

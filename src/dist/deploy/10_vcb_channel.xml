@@ -1,0 +1,12 @@
+<channel-adaptor name='vcb-channel'>
+    <channel class="org.jpos.channel.vcb.VCBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000">
+        <property name="host" value="${bank.vcb.host}" />
+        <property name="port" value="${bank.vcb.port}" />
+        <property name="packager-config" value="cfg/napas.xml" />
+        <property name="timeout" value="60000" />
+    </channel>
+    <in>vcb-send</in>
+    <out>vcb-receive</out>
+    <keep-alive>yes</keep-alive>
+    <reconnect-delay>1000</reconnect-delay>
+</channel-adaptor>
