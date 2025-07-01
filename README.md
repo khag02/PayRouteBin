@@ -1,49 +1,60 @@
-## jPOS Template
+# ISO8583 NAPAS Simulator - Routing & Transaction Logging
 
-Clone this project in order to create your own jPOS based application.
+## 🧩 Mục tiêu dự án
 
-We recommend that you install [Gradle](http://gradle.org/) in order to build your jPOS projects, but if you don't have it installed, you can use the Gradle wrapper scripts `gradlew` and `gradlew.bat`. In the following instructions, when we say `gradle` we really mean either your installed Gradle or one of the wrapper scripts (depending if you are on Unix or DOS based platforms).
+Dự án mô phỏng một hệ thống xử lý giao dịch thanh toán theo chuẩn **ISO 8583**, phù hợp với mô hình hoạt động của **NAPAS** tại Việt Nam. Hệ thống phục vụ mục đích học tập và thử nghiệm trong các nội dung:
 
-### Build an eclipse project
-````
-gradle eclipse
-````
+- Gửi và nhận thông điệp ISO8583 qua TCP
+- Định tuyến giao dịch dựa trên **BIN code** của thẻ
+- Lưu thông tin giao dịch vào hệ thống (cơ sở dữ liệu)
+- Áp dụng các cấu trúc cấu hình trong jPOS (deploy files, packager, transaction manager)
 
-### Build an IDEA project
-````
-gradle idea
-````
+---
 
-### Build your own jar
-````
-gradle jar
-````
+## 🔧 Thành phần chính
 
-### Check the jPOS version
-````
-gradle version
-````
+### 1. Server
 
-### Create a distribution of your application
-````
-gradle dist
-````
-This creates a tar gzipped file in the `build/distributions` directory.
+- Sử dụng jPOS để khởi tạo `ServerChannel` lắng nghe và nhận bản tin
+- Phân tích và định tuyến giao dịch dựa theo:
+- **BIN code (Bank Identification Number)**
+- Các cấu hình `<endpoint>` và `<regexp>` trong `SelectDestination` participant
+- Áp dụng kiểm tra số thẻ bằng thuật toán **Luhn** file generate_card.py để tạo ra pan hợp lệ với thật toán Luhn
+- Ghi log đầy đủ toàn bộ thông điệp, header, và kết quả xử lý
 
-### Install application in 'build/install' directory
-````
-gradle installApp
-````
-Installs application in `build/install` with everything you need to run jPOS. Once the directory is created, you can `cd build/install` and call `java -jar your-project-version.jar` or the `bin/q2` (or `q2.bat`) script available in the `bin` directory.
+### 2. Transaction Manager (jPOS)
 
-### Generate an install a Maven artifact
-````
-gradle install
-````
+- Quản lý luồng giao dịch bằng các participant như:
+- `CheckFields`
+- `SelectDestination`
+- `TransactionLogger`
+- `SendResponse`
+- Lưu lại thông tin giao dịch hợp lệ (trong database)
 
-### List available Gradle tasks
-````
-gradle tasks
-````
+---
 
-# napas_test
+## 📦 Cấu trúc file quan trọng
+
+| File / Thư mục                      | Mô tả |
+|------------------------------------|-------|
+| `deploy/10_server.xml`             | Cấu hình server channel kết nối với host bank |
+| `deploy/30_txnmgr.xml`             | TransactionManager định nghĩa các participant xử lý |
+| `cfg/napas.xml`                    | ISO8583 packager định nghĩa cấu trúc các trường theo chuẩn iso8583 của napas|
+| `log/`                             | Log giao dịch |
+| `README.md`                        | Tài liệu hướng dẫn |
+
+---
+
+## 📍 Routing theo BIN
+
+Trong participant `SelectDestination`, bạn có thể cấu hình routing như sau:
+
+```xml
+<participant class="org.jpos.transaction.participant.SelectDestination">
+  <property name="request" value="REQUEST" />
+  <property name="destination" value="DESTINATION" />
+  <endpoint destination="VCB">970426 411130</endpoint>
+  <endpoint destination="VIB">970441</endpoint>
+  <endpoint destination="TPB">970423</endpoint>
+  <regexp destination="NAPAS_SPECIAL">^4111[0-9]{2}.*</regexp>
+</participant>

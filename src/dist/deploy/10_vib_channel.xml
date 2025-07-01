@@ -1,5 +1,5 @@
 <channel-adaptor name='vib-channel'>
-    <channel class="org.jpos.channel.vib.VIBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000">
+    <channel class="org.jpos.channel.vib.VIBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000" logger="Q2" name="vib-channel" realm="vib-channel">
         <property name="host" value="${bank.vib.host}" />
         <property name="port" value="${bank.vib.port}" />
         <property name="packager-config" value="cfg/napas.xml" />
@@ -8,5 +8,5 @@
     <in>vib-send</in>
     <out>vib-receive</out>
     <keep-alive>yes</keep-alive>
-    <reconnect-delay>1000</reconnect-delay>
+    <reconnect-delay>10000</reconnect-delay>
 </channel-adaptor>

@@ -1,5 +1,5 @@
 <channel-adaptor name='vcb-channel'>
-    <channel class="org.jpos.channel.vcb.VCBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000">
+    <channel class="org.jpos.channel.vcb.VCBChannel" packager="org.jpos.iso.packager.GenericPackager" header="0000000000" logger="Q2" name="vcb-channel" realm="vcb-channel">
         <property name="host" value="${bank.vcb.host}" />
         <property name="port" value="${bank.vcb.port}" />
         <property name="packager-config" value="cfg/napas.xml" />
@@ -8,5 +8,5 @@
     <in>vcb-send</in>
     <out>vcb-receive</out>
     <keep-alive>yes</keep-alive>
-    <reconnect-delay>1000</reconnect-delay>
+    <reconnect-delay>10000</reconnect-delay>
 </channel-adaptor>

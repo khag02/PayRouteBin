@@ -22,7 +22,7 @@
     <isofield id="9" length="8" name="Conversion rate, Reconciliation" class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield id="10" length="8" name="Conversion rate, Cardholder billing" class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield id="11" length="6" name="Systems trace audit number" class="org.jpos.iso.IFA_NUMERIC"/>
-    <isofield id="12" length="12" name="Date and time, Local transaction" class="org.jpos.iso.IFA_NUMERIC"/>
+    <isofield id="12" length="6" name="Date and time, Local transaction" class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield id="13" length="4" name="Date, Effective" class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield id="14" length="4" name="Date, Expiration" class="org.jpos.iso.IFA_NUMERIC"/>
     <isofield id="15" length="6" name="Date, Settlement" class="org.jpos.iso.IFA_NUMERIC"/>

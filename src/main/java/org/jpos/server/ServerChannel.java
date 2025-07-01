@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
+import org.jpos.channel.base.BaseChannel;
 import org.jpos.core.Configuration;
 import org.jpos.core.ConfigurationException;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOFilter;
 import org.jpos.iso.ISOFilter.VetoException;
-import org.jpos.iso.channel.NCCChannel;
+import org.jpos.iso.packager.GenericPackager;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOPackager;
 import org.jpos.iso.ISOUtil;
@@ -29,7 +28,7 @@ import io.micrometer.core.instrument.Counter;
  * [BITMAP (8 or 16 bytes)]
  * [DATA ELEMENTS...]
  */
-public class ServerChannel extends NCCChannel {
+public class ServerChannel extends BaseChannel {
     /**
      * Public constructor
      */
@@ -38,11 +37,10 @@ public class ServerChannel extends NCCChannel {
     private boolean expectKeepAlive;
     private Counter msgOutCounter;
     private Counter msgInCounter;
-    private final UUID uuid;
 
     public ServerChannel() {
         super();
-        this.uuid = null;
+        setHost(null, 0);
     }
 
     /**
@@ -55,7 +53,6 @@ public class ServerChannel extends NCCChannel {
      * @see ISOPackager
      */
     public ServerChannel(String host, int port, ISOPackager p, byte[] TPDU) {
-        this.uuid = null;
         this.header = TPDU;
     }
 
@@ -68,7 +65,6 @@ public class ServerChannel extends NCCChannel {
      * @see ISOPackager
      */
     public ServerChannel(ISOPackager p, byte[] TPDU) throws IOException {
-        this.uuid = null;
         this.header = TPDU;
     }
 
@@ -83,7 +79,6 @@ public class ServerChannel extends NCCChannel {
      */
     public ServerChannel(ISOPackager p, byte[] TPDU, ServerSocket serverSocket)
             throws IOException {
-        this.uuid = null;
         this.header = TPDU;
     }
 
@@ -99,12 +94,12 @@ public class ServerChannel extends NCCChannel {
             throws IOException, ISOException {
         ChannelEvent jfr = new ChannelEvent.Send();
         jfr.begin();
-        LogEvent evt = new LogEvent(this, "send").withTraceId(this.getSocketUUID());
+        LogEvent evt = new LogEvent(this, "send");
         try {
             if (!isConnected())
                 throw new IOException("unconnected ISOChannel");
             m.setDirection(ISOMsg.OUTGOING);
-            ISOPackager p = getDynamicPackager(m);
+            GenericPackager p = new GenericPackager("cfg/napas.xml");
             m.setPackager(p);
             m = applyOutgoingFilters(m, evt);
             evt.addMessage(m);
@@ -160,7 +155,7 @@ public class ServerChannel extends NCCChannel {
 
         byte[] b = null;
         byte[] header = null;
-        LogEvent evt = new LogEvent(this, "receive").withTraceId(getSocketUUID());
+        LogEvent evt = new LogEvent(this, "receive");
         ISOMsg m = createMsg(); // call createMsg instead of createISOMsg for
                                 // backward compatibility
         m.setSource(this);
@@ -177,7 +172,7 @@ public class ServerChannel extends NCCChannel {
                         len = getMessageLength();
                     }
                 }
-                int hLen = getHeaderLength();
+                int hLen = 5;
 
                 if (len == -1) {
                     if (hLen > 0) {
@@ -200,9 +195,10 @@ public class ServerChannel extends NCCChannel {
             } finally {
                 serverInLock.unlock();
             }
-            m.setPackager(getDynamicPackager(header, b));
-            m.setHeader(getDynamicHeader(header));
-            if (b.length > 0 && !shouldIgnore(header)) // Ignore NULL messages
+            GenericPackager p = new GenericPackager("cfg/napas.xml");
+            m.setPackager(p);
+            m.setHeader(header);
+            if (b.length > 0 && !shouldIgnore(header))
                 unpack(m, b);
             m.setDirection(ISOMsg.INCOMING);
             evt.addMessage(m);
@@ -258,6 +254,12 @@ public class ServerChannel extends NCCChannel {
         return Integer.parseInt(new String(b, StandardCharsets.US_ASCII));
     }
 
+    protected byte[] readHeader(int hLen) throws IOException {
+        byte[] header = new byte[hLen];
+        serverIn.read(header, 0, hLen);
+        return header;
+    }
+
     protected void sendMessageHeader(ISOMsg m, int len) throws IOException {
         byte[] h = m.getHeader();
         if (h != null) {
@@ -287,11 +289,5 @@ public class ServerChannel extends NCCChannel {
             throws ConfigurationException {
         super.setConfiguration(cfg);
         tpduSwap = cfg.getBoolean("tpdu-swap", true);
-    }
-
-    private UUID getSocketUUID() {
-        return socket != null
-                ? new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits() ^ socket.hashCode())
-                : uuid;
     }
 }

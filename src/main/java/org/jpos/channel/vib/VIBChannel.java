@@ -2,25 +2,45 @@ package org.jpos.channel.vib;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import org.jpos.channel.base.BaseChannel;
 import org.jpos.core.Configuration;
 import org.jpos.core.ConfigurationException;
 import org.jpos.iso.ISOException;
+import org.jpos.iso.ISOFilter;
+import org.jpos.iso.ISOFilter.VetoException;
+import org.jpos.iso.packager.GenericPackager;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOPackager;
 import org.jpos.iso.ISOUtil;
-import org.jpos.iso.channel.NCCChannel;
+import org.jpos.jfr.ChannelEvent;
+import org.jpos.log.evt.Disconnect;
+import org.jpos.util.Caller;
 import org.jpos.util.LogEvent;
 import org.jpos.util.Logger;
 
-public class VIBChannel extends NCCChannel {
+import io.micrometer.core.instrument.Counter;
+
+/**
+ * [4 BYTE ASCII LENGTH]
+ * [MTI (4 bytes)]
+ * [BITMAP (8 or 16 bytes)]
+ * [DATA ELEMENTS...]
+ */
+public class VIBChannel extends BaseChannel {
     /**
      * Public constructor
      */
     boolean tpduSwap = true;
+    private Socket socket;
+    private boolean expectKeepAlive;
+    private Counter msgOutCounter;
+    private Counter msgInCounter;
 
     public VIBChannel() {
         super();
+        setHost(null, 0);
     }
 
     /**
@@ -62,21 +82,182 @@ public class VIBChannel extends NCCChannel {
         this.header = TPDU;
     }
 
-    protected void sendMessageLength(int len) throws IOException {
+    /**
+     * sends an ISOMsg over the TCP/IP session
+     *
+     * @param m the Message to be sent
+     * @exception IOException
+     * @exception ISOException
+     * @exception ISOFilter.VetoException;
+     */
+    public void send(ISOMsg m)
+            throws IOException, ISOException {
+        ChannelEvent jfr = new ChannelEvent.Send();
+        jfr.begin();
+        LogEvent evt = new LogEvent(this, "send");
         try {
-            serverOut.write(
-                    ISOUtil.str2bcd(
-                            ISOUtil.zeropad(Integer.toString(len % 10000), 4), true));
-        } catch (ISOException e) {
-            Logger.log(new LogEvent(this, "send-message-length", e));
+            if (!isConnected())
+                throw new IOException("unconnected ISOChannel");
+            m.setDirection(ISOMsg.OUTGOING);
+            ISOPackager p = getDynamicPackager(m);
+            m.setPackager(p);
+            m = applyOutgoingFilters(m, evt);
+            evt.addMessage(m);
+            m.setDirection(ISOMsg.OUTGOING); // filter may have dropped this info
+            m.setPackager(p); // and could have dropped packager as well
+            byte[] b = pack(m);
+            serverOutLock.lock();
+            try {
+                sendMessageLength(b.length + getHeaderLength(m));
+                sendMessageHeader(m, b.length);
+                sendMessage(b, 0, b.length);
+                sendMessageTrailer(m, b);
+                serverOut.flush();
+            } finally {
+                serverOutLock.unlock();
+            }
+            cnt[TX]++;
+            if (msgOutCounter != null)
+                msgOutCounter.increment();
+            setChanged();
+            notifyObservers(m);
+            jfr.setDetail(m.toString());
+        } catch (VetoException e) {
+            // if a filter vets the message it was not added to the event
+            evt.addMessage(m);
+            evt.addMessage(e);
+            jfr.append(e.getMessage());
+            throw e;
+        } catch (ISOException | IOException e) {
+            evt.addMessage(e);
+            jfr = new ChannelEvent.SendException(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            evt.addMessage(e);
+            jfr = new ChannelEvent.SendException(e.getMessage());
+            throw new IOException("unexpected exception", e);
+        } finally {
+            Logger.log(evt);
+            jfr.commit();
         }
     }
 
-    protected int getMessageLength() throws IOException, ISOException {
-        byte[] b = new byte[2];
-        serverIn.readFully(b, 0, 2);
-        return Integer.parseInt(
-                ISOUtil.bcd2str(b, 0, 4, true));
+    /**
+     * Waits and receive an ISOMsg over the TCP/IP session
+     *
+     * @return the Message received
+     * @throws IOException
+     * @throws ISOException
+     */
+    public ISOMsg receive() throws IOException, ISOException {
+        var jfr = new ChannelEvent.Receive();
+        jfr.begin();
+
+        byte[] b = null;
+        byte[] header = null;
+        LogEvent evt = new LogEvent(this, "receive");
+        ISOMsg m = createMsg(); // call createMsg instead of createISOMsg for
+                                // backward compatibility
+        m.setSource(this);
+        try {
+            if (!isConnected())
+                throw new IOException("unconnected ISOChannel");
+
+            serverInLock.lock();
+            try {
+                int len = getMessageLength();
+                if (expectKeepAlive) {
+                    while (len == 0) {
+                        // If zero length, this is a keep alive msg
+                        len = getMessageLength();
+                    }
+                }
+                int hLen = 5;
+
+                if (len == -1) {
+                    if (hLen > 0) {
+                        header = readHeader(hLen);
+                    }
+                    b = streamReceive();
+                } else if (len > 0 && len <= getMaxPacketLength()) {
+                    if (hLen > 0) {
+                        // ignore message header (TPDU)
+                        // Note header length is not necessarily equal to hLen (see VAPChannel)
+                        header = readHeader(hLen);
+                        len -= header.length;
+                    }
+                    b = new byte[len];
+                    getMessage(b, 0, len);
+                    getMessageTrailer(m);
+                } else
+                    throw new ISOException(
+                            "receive length " + len + " seems strange - maxPacketLength = " + getMaxPacketLength());
+            } finally {
+                serverInLock.unlock();
+            }
+            GenericPackager p = new GenericPackager("cfg/napas.xml");
+            m.setPackager(p);
+            m.setHeader(header);
+            if (b.length > 0 && !shouldIgnore(header))
+                unpack(m, b);
+            m.setDirection(ISOMsg.INCOMING);
+            evt.addMessage(m);
+            m = applyIncomingFilters(m, header, b, evt);
+            m.setDirection(ISOMsg.INCOMING);
+            cnt[RX]++;
+            if (msgInCounter != null) {
+                msgInCounter.increment();
+            }
+            setChanged();
+            notifyObservers(m);
+        } catch (ISOException e) {
+            evt.addMessage(e);
+            if (header != null) {
+                evt.addMessage("--- header ---");
+                evt.addMessage(ISOUtil.hexdump(header));
+            }
+            if (b != null) {
+                evt.addMessage("--- data ---");
+                evt.addMessage(ISOUtil.hexdump(b));
+            }
+            throw e;
+        } catch (IOException e) {
+            evt.addMessage(
+                    new Disconnect(socket.getInetAddress().getHostAddress(), socket.getPort(), socket.getLocalPort(),
+                            "%s (%s)".formatted(Caller.shortClassName(e.getClass().getName()), Caller.info()),
+                            e.getMessage()));
+            closeSocket();
+            throw e;
+        } catch (Exception e) {
+            closeSocket();
+            evt.addMessage(m);
+            evt.addMessage(e);
+            throw new IOException("unexpected exception", e);
+        } finally {
+            Logger.log(evt);
+        }
+        jfr.setDetail(m.toString());
+        jfr.commit();
+        return m;
+    }
+
+    @Override
+    protected void sendMessageLength(int len) throws IOException {
+        String lenStr = String.format("%04d", len);
+        serverOut.write(lenStr.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    @Override
+    protected int getMessageLength() throws IOException {
+        byte[] b = new byte[4];
+        serverIn.readFully(b);
+        return Integer.parseInt(new String(b, StandardCharsets.US_ASCII));
+    }
+
+    protected byte[] readHeader(int hLen) throws IOException {
+        byte[] header = new byte[hLen];
+        serverIn.read(header, 0, hLen);
+        return header;
     }
 
     protected void sendMessageHeader(ISOMsg m, int len) throws IOException {
