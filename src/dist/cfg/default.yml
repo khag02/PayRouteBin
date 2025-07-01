@@ -1,4 +1,4 @@
-
+# This is config server TCP terminal
 qserver:
   port: 8899
 
@@ -17,14 +17,24 @@ bank:
     host: localhost
     port: 8003
 
+# This is config port server for host simulate
+hostSimulate:
+  tpb:
+    port: 8000
+  tcb:
+    port: 8001
+  vcb:
+    port: 8002
+  vib:
+    port: 8003
 
+# This is config for connect to database
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/jpos3
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
