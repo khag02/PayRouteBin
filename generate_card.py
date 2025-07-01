@@ -31,8 +31,6 @@ def generate_valid_pan(bin_prefix: str, length: int = 16):
 
     raise RuntimeError("Không thể tính được check digit hợp lệ")
 
-
-# 👉 Example: Generate 10 valid PANs for BIN 411113 (VIB)
 if __name__ == "__main__":
     bin_code = "970426"
     for _ in range(1):
