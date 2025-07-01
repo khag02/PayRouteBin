@@ -4,7 +4,9 @@
     <property name="max-sessions" value="1000" />
     <property name="debug-context" value="false" />
 
-    <participant class="org.jpos.transaction.participant.SelectDestination">
+    <participant class="org.jpos.transaction.participant.CheckFields"/>
+
+    <participant class="org.jpos.transaction.participant.SelectDestination" logger="Q2">
         <property name="request" value="REQUEST" />
         <property name="destination" value="DESTINATION" />
         <property name="default-destination" value="NAPAS_DEFAULT" />
@@ -20,5 +22,9 @@
     </participant>
 
     <participant class="org.jpos.transaction.participant.QueryHost"/>
+
+    <participant class="org.jpos.transaction.participant.Transaction"/>
+
     <participant class="org.jpos.transaction.participant.SendResponse"/>
+
 </txnmgr>
