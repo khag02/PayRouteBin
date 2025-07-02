@@ -19,6 +19,7 @@ import org.jpos.log.evt.Disconnect;
 import org.jpos.util.Caller;
 import org.jpos.util.LogEvent;
 import org.jpos.util.Logger;
+import org.jpos.log.AuditLogEvent;
 
 import io.micrometer.core.instrument.Counter;
 

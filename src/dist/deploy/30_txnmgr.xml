@@ -2,7 +2,6 @@
     <property name="queue" value="TXNMGR" />
     <property name="sessions" value="1" />
     <property name="max-sessions" value="1000" />
-    <property name="debug-context" value="false" />
 
     <participant class="org.jpos.transaction.participant.CheckFields"/>
 

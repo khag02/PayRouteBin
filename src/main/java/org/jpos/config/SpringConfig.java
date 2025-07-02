@@ -10,15 +10,15 @@ import org.springframework.orm.jpa.*;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
 import javax.sql.DataSource;
 import java.util.Properties;
+import org.jpos.log.AuditLogEvent;
 
 @PropertySource(value = "classpath:default.yml", factory = YamlPropertySourceFactory.class)
 @Configuration
 @ComponentScan("org.jpos")
 @EnableJpaRepositories(basePackages = "org.jpos.repository")
-@EntityScan(basePackages = "org.jpos.model")
+@EntityScan(basePackages = "org.jpos.entity")
 @EnableTransactionManagement
 public class SpringConfig {
 
@@ -48,7 +48,7 @@ public class SpringConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         var emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource);
-        emf.setPackagesToScan("org.jpos.model");
+        emf.setPackagesToScan("org.jpos.entity");
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties props = new Properties();

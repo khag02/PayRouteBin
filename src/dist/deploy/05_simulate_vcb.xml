@@ -1,6 +1,6 @@
 <server class="org.jpos.q2.iso.QServer" name="vcb-simulator">
     <attr name="port" type="java.lang.Integer">${hostSimulate.vcb.port}</attr>
-    <channel class="org.jpos.channelSimulate.vcb.VCBChannelSimulate" packager="org.jpos.iso.packager.PostPackager" logger="Q2" name="vcb-channel" realm="vcb-channel">
+    <channel class="org.jpos.channelsimulate.vcb.VCBChannelSimulate" packager="org.jpos.iso.packager.PostPackager" logger="Q2" name="vcb-channel" realm="vcb-channel">
         <property name="packager-config" value="cfg/napas.xml" />
     </channel>
     <request-listener class="org.jpos.bsh.BSHRequestListener">

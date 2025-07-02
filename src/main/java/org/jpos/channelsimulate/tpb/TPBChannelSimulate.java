@@ -1,4 +1,4 @@
-package org.jpos.channelSimulate.vcb;
+package org.jpos.channelsimulate.tpb;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,7 +28,7 @@ import io.micrometer.core.instrument.Counter;
  * [BITMAP (8 or 16 bytes)]
  * [DATA ELEMENTS...]
  */
-public class VCBChannelSimulate extends BaseChannel {
+public class TPBChannelSimulate extends BaseChannel {
     /**
      * Public constructor
      */
@@ -38,7 +38,7 @@ public class VCBChannelSimulate extends BaseChannel {
     private Counter msgOutCounter;
     private Counter msgInCounter;
 
-    public VCBChannelSimulate() {
+    public TPBChannelSimulate() {
         super();
         setHost(null, 0);
     }
@@ -52,7 +52,7 @@ public class VCBChannelSimulate extends BaseChannel {
      * @param TPDU an optional raw header (i.e. TPDU)
      * @see ISOPackager
      */
-    public VCBChannelSimulate(String host, int port, ISOPackager p, byte[] TPDU) {
+    public TPBChannelSimulate(String host, int port, ISOPackager p, byte[] TPDU) {
         this.header = TPDU;
     }
 
@@ -64,7 +64,7 @@ public class VCBChannelSimulate extends BaseChannel {
      * @exception IOException
      * @see ISOPackager
      */
-    public VCBChannelSimulate(ISOPackager p, byte[] TPDU) throws IOException {
+    public TPBChannelSimulate(ISOPackager p, byte[] TPDU) throws IOException {
         this.header = TPDU;
     }
 
@@ -77,7 +77,7 @@ public class VCBChannelSimulate extends BaseChannel {
      * @exception IOException
      * @see ISOPackager
      */
-    public VCBChannelSimulate(ISOPackager p, byte[] TPDU, ServerSocket serverSocket)
+    public TPBChannelSimulate(ISOPackager p, byte[] TPDU, ServerSocket serverSocket)
             throws IOException {
         this.header = TPDU;
     }
@@ -94,7 +94,7 @@ public class VCBChannelSimulate extends BaseChannel {
             throws IOException, ISOException {
         ChannelEvent jfr = new ChannelEvent.Send();
         jfr.begin();
-        LogEvent evt = new LogEvent(this, "VCB-simulate-send");
+        LogEvent evt = new LogEvent(this, "TPB-simulate-send");
         try {
             if (!isConnected())
                 throw new IOException("unconnected ISOChannel");
@@ -155,7 +155,7 @@ public class VCBChannelSimulate extends BaseChannel {
 
         byte[] b = null;
         byte[] header = null;
-        LogEvent evt = new LogEvent(this, "VCB-simulate-receive");
+        LogEvent evt = new LogEvent(this, "TPB-simulate-receive");
         ISOMsg m = createMsg(); // call createMsg instead of createISOMsg for
                                 // backward compatibility
         m.setSource(this);

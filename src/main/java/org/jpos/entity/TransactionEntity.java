@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-import org.jpos.iso.ISOUtil;
 import org.jpos.utils.TransactionUtils;
 
 @Entity
@@ -68,6 +67,9 @@ public class TransactionEntity {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (this.pan != null && !this.pan.isEmpty()) {
+            this.pan = TransactionUtils.maskPAN(this.pan);
+        }
     }
 
     @PreUpdate
@@ -75,10 +77,4 @@ public class TransactionEntity {
         updatedAt = LocalDateTime.now();
     }
 
-    @PrePersist
-    public void prePersist() {
-        if (this.pan != null && !this.pan.isEmpty()) {
-            this.pan = TransactionUtils.maskPAN(this.pan);
-        }
-    }
 }

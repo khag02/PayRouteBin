@@ -13,8 +13,6 @@ import org.jpos.iso.ISOMsg;
 import org.jpos.service.TransactionService;
 import org.jpos.transaction.Context;
 import org.jpos.transaction.TransactionParticipant;
-import org.jpos.q2.qbean.LoggerAdaptor;
-import org.jpos.util.SimpleLogListener;
 
 public class Transaction implements TransactionParticipant {
     private TransactionService transactionService;

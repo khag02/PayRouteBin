@@ -1,4 +1,4 @@
-package org.jpos.channelSimulate.tcb;
+package org.jpos.channelsimulate.vib;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -28,7 +28,7 @@ import io.micrometer.core.instrument.Counter;
  * [BITMAP (8 or 16 bytes)]
  * [DATA ELEMENTS...]
  */
-public class TCBChannelSimulate extends BaseChannel {
+public class VIBChannelSimulate extends BaseChannel {
     /**
      * Public constructor
      */
@@ -38,7 +38,7 @@ public class TCBChannelSimulate extends BaseChannel {
     private Counter msgOutCounter;
     private Counter msgInCounter;
 
-    public TCBChannelSimulate() {
+    public VIBChannelSimulate() {
         super();
         setHost(null, 0);
     }
@@ -52,7 +52,7 @@ public class TCBChannelSimulate extends BaseChannel {
      * @param TPDU an optional raw header (i.e. TPDU)
      * @see ISOPackager
      */
-    public TCBChannelSimulate(String host, int port, ISOPackager p, byte[] TPDU) {
+    public VIBChannelSimulate(String host, int port, ISOPackager p, byte[] TPDU) {
         this.header = TPDU;
     }
 
@@ -64,7 +64,7 @@ public class TCBChannelSimulate extends BaseChannel {
      * @exception IOException
      * @see ISOPackager
      */
-    public TCBChannelSimulate(ISOPackager p, byte[] TPDU) throws IOException {
+    public VIBChannelSimulate(ISOPackager p, byte[] TPDU) throws IOException {
         this.header = TPDU;
     }
 
@@ -77,7 +77,7 @@ public class TCBChannelSimulate extends BaseChannel {
      * @exception IOException
      * @see ISOPackager
      */
-    public TCBChannelSimulate(ISOPackager p, byte[] TPDU, ServerSocket serverSocket)
+    public VIBChannelSimulate(ISOPackager p, byte[] TPDU, ServerSocket serverSocket)
             throws IOException {
         this.header = TPDU;
     }
@@ -94,12 +94,12 @@ public class TCBChannelSimulate extends BaseChannel {
             throws IOException, ISOException {
         ChannelEvent jfr = new ChannelEvent.Send();
         jfr.begin();
-        LogEvent evt = new LogEvent(this, "TCB-simulate-send");
+        LogEvent evt = new LogEvent(this, "VIB-simulate-send");
         try {
             if (!isConnected())
                 throw new IOException("unconnected ISOChannel");
             m.setDirection(ISOMsg.OUTGOING);
-            GenericPackager p = new GenericPackager("cfg/napas.xml");
+            ISOPackager p = getDynamicPackager(m);
             m.setPackager(p);
             m = applyOutgoingFilters(m, evt);
             evt.addMessage(m);
@@ -155,7 +155,7 @@ public class TCBChannelSimulate extends BaseChannel {
 
         byte[] b = null;
         byte[] header = null;
-        LogEvent evt = new LogEvent(this, "TCB-simulate-receive");
+        LogEvent evt = new LogEvent(this, "VIB-simulate-receive");
         ISOMsg m = createMsg(); // call createMsg instead of createISOMsg for
                                 // backward compatibility
         m.setSource(this);
