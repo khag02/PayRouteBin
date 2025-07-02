@@ -13,6 +13,8 @@ import org.jpos.iso.ISOMsg;
 import org.jpos.service.TransactionService;
 import org.jpos.transaction.Context;
 import org.jpos.transaction.TransactionParticipant;
+import org.jpos.q2.qbean.LoggerAdaptor;
+import org.jpos.util.SimpleLogListener;
 
 public class Transaction implements TransactionParticipant {
     private TransactionService transactionService;
@@ -47,12 +49,23 @@ public class Transaction implements TransactionParticipant {
 
     private void handlePurchase(ISOMsg request, ISOMsg response) {
         TransactionEntity transactionEntity = new TransactionEntity();
-
         // save data request
+        transactionEntity.setMti(request.getString(ISOMsgField.F0_MTI));
+        transactionEntity.setPan(request.getString(ISOMsgField.F2_PAN));
+        transactionEntity.setProcessingCode(request.getString(ISOMsgField.F3_PROCESSING_CODE));
         transactionEntity.setAmount(request.getString(ISOMsgField.F4_AMOUNT_TRANSACTION));
+        transactionEntity.setTransmissionDateTime(request.getString(ISOMsgField.F7_TRANSMISSION_DATE_TIME));
+        transactionEntity.setStan(request.getString(ISOMsgField.F11_STAN));
+        transactionEntity.setLocalTransactionTime(request.getString(ISOMsgField.F12_LOCAL_DATE_TIME));
+        transactionEntity.setRetrievalReferenceNumber(request.getString(ISOMsgField.F37_RETRIEVAL_REF));
+        transactionEntity.setTerminalId(request.getString(ISOMsgField.F41_TERMINAL_ID));
+        transactionEntity.setMerchantId(request.getString(ISOMsgField.F42_MERCHANT_ID));
+        transactionEntity.setAdditionalData(request.getString(ISOMsgField.F48_ADDITIONAL_DATA_PRIVATE));
+        transactionEntity.setCurrencyCode(request.getString(ISOMsgField.F49_CURRENCY_TRANSACTION));
 
         // save data response
         transactionEntity.setResponseCode(response.getString(ISOMsgField.F39_RESPONSE_CODE));
+
         transactionService.save(transactionEntity);
     }
 

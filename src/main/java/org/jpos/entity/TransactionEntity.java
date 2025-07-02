@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import org.jpos.iso.ISOUtil;
+import org.jpos.utils.TransactionUtils;
+
 @Entity
 @Table(name = "transactions")
 @Data
@@ -59,8 +62,23 @@ public class TransactionEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.pan != null && !this.pan.isEmpty()) {
+            this.pan = TransactionUtils.maskPAN(this.pan);
+        }
     }
 }
