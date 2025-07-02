@@ -23,7 +23,7 @@ public enum ISOMsgContext {
     ORIGINAL_TIMESTAMP,
     ORIGINAL_DATA_ELEMENTS,
     DESTINATION,
-    PANIC, TXN_TYPE, MTI;
+    PANIC, TXN_TYPE, MTI, RESPONSE_CODE;
 
     private final String name;
 
