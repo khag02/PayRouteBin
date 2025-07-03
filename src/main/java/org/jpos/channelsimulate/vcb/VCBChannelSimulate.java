@@ -19,6 +19,7 @@ import org.jpos.log.evt.Disconnect;
 import org.jpos.util.Caller;
 import org.jpos.util.LogEvent;
 import org.jpos.util.Logger;
+import org.jpos.logging.formatLog;
 
 import io.micrometer.core.instrument.Counter;
 
@@ -94,7 +95,8 @@ public class VCBChannelSimulate extends BaseChannel {
             throws IOException, ISOException {
         ChannelEvent jfr = new ChannelEvent.Send();
         jfr.begin();
-        LogEvent evt = new LogEvent(this, "VCB-simulate-send");
+        LogEvent evt = new LogEvent(this, "send");
+
         try {
             if (!isConnected())
                 throw new IOException("unconnected ISOChannel");
@@ -102,7 +104,7 @@ public class VCBChannelSimulate extends BaseChannel {
             GenericPackager p = new GenericPackager("cfg/napas.xml");
             m.setPackager(p);
             m = applyOutgoingFilters(m, evt);
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             m.setDirection(ISOMsg.OUTGOING); // filter may have dropped this info
             m.setPackager(p); // and could have dropped packager as well
             byte[] b = pack(m);
@@ -124,7 +126,7 @@ public class VCBChannelSimulate extends BaseChannel {
             jfr.setDetail(m.toString());
         } catch (VetoException e) {
             // if a filter vets the message it was not added to the event
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             evt.addMessage(e);
             jfr.append(e.getMessage());
             throw e;
@@ -155,7 +157,8 @@ public class VCBChannelSimulate extends BaseChannel {
 
         byte[] b = null;
         byte[] header = null;
-        LogEvent evt = new LogEvent(this, "VCB-simulate-receive");
+        LogEvent evt = new LogEvent(this, "rcve");
+
         ISOMsg m = createMsg(); // call createMsg instead of createISOMsg for
                                 // backward compatibility
         m.setSource(this);
@@ -201,7 +204,7 @@ public class VCBChannelSimulate extends BaseChannel {
             if (b.length > 0 && !shouldIgnore(header))
                 unpack(m, b);
             m.setDirection(ISOMsg.INCOMING);
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             m = applyIncomingFilters(m, header, b, evt);
             m.setDirection(ISOMsg.INCOMING);
             cnt[RX]++;
@@ -222,15 +225,20 @@ public class VCBChannelSimulate extends BaseChannel {
             }
             throw e;
         } catch (IOException e) {
-            evt.addMessage(
-                    new Disconnect(socket.getInetAddress().getHostAddress(), socket.getPort(), socket.getLocalPort(),
-                            "%s (%s)".formatted(Caller.shortClassName(e.getClass().getName()), Caller.info()),
-                            e.getMessage()));
+            if (socket != null) {
+                evt.addMessage(
+                        new Disconnect(
+                                socket.getInetAddress().getHostAddress(),
+                                socket.getPort(),
+                                socket.getLocalPort(),
+                                "%s (%s)".formatted(Caller.shortClassName(e.getClass().getName()), Caller.info()),
+                                e.getMessage()));
+            }
             closeSocket();
             throw e;
         } catch (Exception e) {
             closeSocket();
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             evt.addMessage(e);
             throw new IOException("unexpected exception", e);
         } finally {

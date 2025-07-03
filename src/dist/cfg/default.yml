@@ -1,6 +1,6 @@
 # This is config server TCP terminal
 qserver:
-  port: 8899
+  port: 9999
 
 # This is config channal for bank Acquirer
 bank:

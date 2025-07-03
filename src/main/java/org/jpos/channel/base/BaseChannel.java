@@ -26,6 +26,7 @@ import org.jpos.jfr.ChannelEvent;
 import org.jpos.log.evt.Connect;
 import org.jpos.log.evt.Disconnect;
 import org.jpos.util.*;
+import org.jpos.logging.formatLog;
 
 import javax.net.ssl.SSLSocket;
 import java.io.*;
@@ -671,7 +672,7 @@ public abstract class BaseChannel extends Observable
             ISOPackager p = getDynamicPackager(m);
             m.setPackager(p);
             m = applyOutgoingFilters(m, evt);
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             m.setDirection(ISOMsg.OUTGOING); // filter may have dropped this info
             m.setPackager(p); // and could have dropped packager as well
             byte[] b = pack(m);
@@ -693,7 +694,7 @@ public abstract class BaseChannel extends Observable
             jfr.setDetail(m.toString());
         } catch (VetoException e) {
             // if a filter vets the message it was not added to the event
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             evt.addMessage(e);
             jfr.append(e.getMessage());
             throw e;
@@ -857,7 +858,7 @@ public abstract class BaseChannel extends Observable
             if (b.length > 0 && !shouldIgnore(header)) // Ignore NULL messages
                 unpack(m, b);
             m.setDirection(ISOMsg.INCOMING);
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             m = applyIncomingFilters(m, header, b, evt);
             m.setDirection(ISOMsg.INCOMING);
             cnt[RX]++;
@@ -886,7 +887,7 @@ public abstract class BaseChannel extends Observable
             throw e;
         } catch (Exception e) {
             closeSocket();
-            evt.addMessage(m);
+            formatLog.log(m, evt);
             evt.addMessage(e);
             throw new IOException("unexpected exception", e);
         } finally {

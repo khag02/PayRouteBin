@@ -6,6 +6,7 @@ import org.jpos.iso.ISORequestListener;
 import org.jpos.iso.ISOSource;
 import org.jpos.util.LogEvent;
 import org.jpos.util.Logger;
+import org.jpos.logging.formatLog;
 
 public class MuxRequestListener implements ISORequestListener {
     @Override
@@ -17,7 +18,7 @@ public class MuxRequestListener implements ISORequestListener {
         } catch (ISOException e) {
             e.printStackTrace();
         }
-        evt.addMessage(m);
+        formatLog.log(m, evt);
         Logger.log(evt);
         return false;
     }
