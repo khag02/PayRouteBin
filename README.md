@@ -206,12 +206,9 @@ To generate valid card PANs (Primary Account Numbers) that pass the **Luhn algor
 python generate_card.py
 ```
 
-> ✅ This script will output randomly generated PANs that are structurally valid and ready to be used in ISO8583 transaction testing (e.g. field 2).
+> ✅ This script input Bincode will output randomly generated PANs that are structurally valid and ready to be used in ISO8583 transaction testing (e.g. field 2).
 
 ---
-
-Would you like me to include a sample `generate_card.py` implementation that supports BIN input and generates valid cards?
-
 
 ### 4. Send ISO8583 Message
 
