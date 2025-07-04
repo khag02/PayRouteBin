@@ -13,6 +13,7 @@ import org.jpos.transaction.TransactionParticipant;
 import org.jpos.util.Caller;
 import org.jpos.util.Chronometer;
 import org.jpos.util.NameRegistrar;
+import org.slf4j.LoggerFactory;
 import org.jpos.transaction.Context;
 
 public class QueryHost implements TransactionParticipant, Configurable {
@@ -30,6 +31,7 @@ public class QueryHost implements TransactionParticipant, Configurable {
     private Configuration cfg;
     private boolean ignoreUnreachable;
     private boolean checkConnected = true;
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SelectDestination.class);
 
     public QueryHost() {
         super();
@@ -46,12 +48,16 @@ public class QueryHost implements TransactionParticipant, Configurable {
         }
         String muxName = cfg.get("mux." + ds, "mux." + ds);
         MUX mux = NameRegistrar.getIfExists(muxName);
-        if (mux == null)
-            return result.fail(CMF.MISCONFIGURED_ENDPOINT, Caller.info(), "MUX '%s' not found", muxName).FAIL();
+        if (mux == null) {
+            LOGGER.warn("MUX '{}' not found in NameRegistrar", muxName);
+            return ABORTED;
+        }
 
         ISOMsg m = ctx.get(requestName);
-        if (m == null)
+        if (m == null) {
+            LOGGER.warn("Request '%s' is null in Context", requestName);
             return result.fail(CMF.INVALID_REQUEST, Caller.info(), "'%s' is null", requestName).FAIL();
+        }
 
         Chronometer chronometer = new Chronometer();
         if (isConnected(mux)) {
@@ -63,17 +69,22 @@ public class QueryHost implements TransactionParticipant, Configurable {
                     ctx.put(responseName, resp);
                     return PREPARED | READONLY | NO_JOIN;
                 } else if (ignoreUnreachable) {
+                    LOGGER.warn("MUX '{}' did not respond, but ignoring as per configuration", muxName);
                     ctx.log(String.format("MUX '%s' no response", muxName));
                 } else {
-                    return result.fail(CMF.HOST_UNREACHABLE, Caller.info(), "'%s' does not respond", muxName).FAIL();
+                    LOGGER.warn("MUX '{}' did not respond", muxName);
+                    return ABORTED;
                 }
             } catch (ISOException e) {
-                return result.fail(CMF.SYSTEM_ERROR, Caller.info(), e.getMessage()).FAIL();
+                LOGGER.error("ISOException while querying MUX '{}': {}", muxName, e.getMessage(), e);
+                return ABORTED;
             }
         } else if (ignoreUnreachable) {
+            LOGGER.warn("MUX '{}' not connected, but ignoring as per configuration", muxName);
             ctx.log(String.format("MUX '%s' not connected", muxName));
         } else {
-            return result.fail(CMF.HOST_UNREACHABLE, Caller.info(), "'%s' is not connected", muxName).FAIL();
+            LOGGER.warn("MUX '{}' is not connected", muxName);
+            return ABORTED;
         }
         return PREPARED | NO_JOIN | READONLY;
     }

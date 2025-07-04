@@ -12,7 +12,7 @@
         <property name="fail" value="true" />
         <property name="ignore-card-validations" value="false" />
         <property name="ignore-luhn" value="false" />
-        <endpoint destination="VCB">970426 970425</endpoint>
+        <!-- <endpoint destination="VCB">970426 970425</endpoint> -->
         <endpoint destination="VIB">970441</endpoint>
         <endpoint destination="TCB">970407</endpoint>
         <endpoint destination="TPB">970423</endpoint>

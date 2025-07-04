@@ -44,7 +44,6 @@ public class CheckFields implements TransactionParticipant, Configurable {
             Set<String> validFields = new HashSet<>();
             assertFields(ctx, m, cfg.get("mandatory", ""), true, validFields, rc);
             assertFields(ctx, m, cfg.get("optional", ""), false, validFields, rc);
-
         } catch (Throwable t) {
             rc.fail(CMF.SYSTEM_ERROR, Caller.info(), t.getMessage());
             ctx.log(t);

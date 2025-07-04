@@ -14,6 +14,7 @@ import org.jpos.util.Caller;
 import org.jpos.util.Log;
 import org.jpos.util.LogEvent;
 import org.jpos.util.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -30,6 +31,7 @@ public class SelectDestination implements TransactionParticipant, Configurable, 
     private CardValidator validator;
     private Set<BinRange> binranges = new TreeSet<>();
     private List<PanRegExp> regexps = new ArrayList<>();
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SelectDestination.class);
 
     @Override
     public int prepare(long id, Serializable context) {
@@ -45,8 +47,10 @@ public class SelectDestination implements TransactionParticipant, Configurable, 
                     destinationSet = true;
                 }
             } catch (InvalidCardException ex) {
+                LOGGER.error("Invalid card in request: ", ex);
                 return ctx.getResult().fail(
-                        CMF.INVALID_CARD_OR_CARDHOLDER_NUMBER, Caller.info(), ex.getMessage()).FAIL();
+                        CMF.INVALID_CARD_OR_CARDHOLDER_NUMBER, Caller.info(),
+                        ex.getMessage()).FAIL();
             }
         }
         if (!destinationSet && ctx.get(destinationName) == null)
