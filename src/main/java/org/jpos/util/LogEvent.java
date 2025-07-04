@@ -11,11 +11,9 @@ import java.io.PrintStream;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import org.jpos.transaction.TransactionManager;
 
 /**
  * @author apr
@@ -32,7 +30,6 @@ public class LogEvent {
     private String traceId;
     private boolean springStyleLogging = true;
 
-    // ANSI color codes
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_FAINT = "\u001B[2m";
     private static final String ANSI_RED = "\u001B[31m";
@@ -41,8 +38,8 @@ public class LogEvent {
     private static final String ANSI_BLUE = "\u001B[34m";
     private static final String ANSI_CYAN = "\u001B[36m";
     private static final String ANSI_WHITE = "\u001B[37m";
+    private static final String ANSI_MAGENTA = "\u001B[35m";
 
-    // Spring-style log level mapping
     private static final Map<String, String> LOG_LEVEL_MAP = new HashMap<>();
     static {
         LOG_LEVEL_MAP.put("debug", "DEBUG");
@@ -52,7 +49,6 @@ public class LogEvent {
         LOG_LEVEL_MAP.put("trace", "TRACE");
     }
 
-    // Log level colors mapping
     private static final Map<String, String> LOG_LEVEL_COLORS = new HashMap<>();
     static {
         LOG_LEVEL_COLORS.put("error", ANSI_RED);
@@ -62,10 +58,9 @@ public class LogEvent {
         LOG_LEVEL_COLORS.put("trace", ANSI_GREEN);
     }
 
-    // Date formatter for UTC timezone
-    private static final DateTimeFormatter UTC_FORMATTER = DateTimeFormatter
+    private static final DateTimeFormatter LOGBACK_FORMATTER = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-            .withZone(ZoneId.of("UTC"));
+            .withZone(ZoneId.systemDefault());
 
     public LogEvent(String tag) {
         super();
@@ -136,13 +131,13 @@ public class LogEvent {
 
     protected String dumpHeader(PrintStream p, String indent) {
         if (springStyleLogging) {
-            return dumpSpringStyleHeader(p, indent);
+            return dumpLogbackStyleHeader(p, indent);
         } else {
             return dumpOriginalHeader(p, indent);
         }
     }
 
-    private String dumpSpringStyleHeader(PrintStream p, String indent) {
+    private String dumpLogbackStyleHeader(PrintStream p, String indent) {
         if (noArmor) {
             return indent;
         }
@@ -150,70 +145,86 @@ public class LogEvent {
         dumpedAt = getDumpedAt();
         StringBuilder sb = new StringBuilder();
 
-        String timestamp = UTC_FORMATTER.format(dumpedAt);
-        sb.append(ANSI_FAINT)
-                .append(timestamp)
-                .append(ANSI_RESET)
-                .append("  ");
-
-        String logLevel = LOG_LEVEL_MAP.getOrDefault(tag.toLowerCase(), "INFO");
-        String levelColor = LOG_LEVEL_COLORS.getOrDefault(tag.toLowerCase(), ANSI_GREEN);
-        sb.append(levelColor)
-                .append(String.format("%-5s", logLevel))
-                .append(ANSI_RESET)
-                .append(" ");
-
-        // Thread name
-        // sb.append(ANSI_MAGENTA)
-        // .append(String.format("[%-15.15s]", Thread.currentThread().getName()))
-        // .append(ANSI_RESET)
-        // .append(" ");
-
-        // Separator
-        sb.append(ANSI_FAINT)
-                .append("--- ")
-                .append(ANSI_RESET);
-
-        if (source != null) {
-            String className = source.getClass().getSimpleName();
-            if (className.isEmpty()) {
-                className = source.getClass().getName();
-                int lastDot = className.lastIndexOf('.');
-                if (lastDot > 0) {
-                    className = className.substring(lastDot + 1);
-                }
-            }
-
-            int maxLength = 18;
-            if (className.length() > maxLength) {
-                className = className.substring(0, maxLength);
-            } else {
-                className = String.format("%-" + maxLength + "s", className);
-            }
-
-            sb.append(ANSI_CYAN)
-                    .append(className)
+        String timestamp = LOGBACK_FORMATTER.format(dumpedAt);
+        if (supportsAnsiColors()) {
+            sb.append(ANSI_FAINT)
+                    .append(timestamp)
                     .append(ANSI_RESET);
         } else {
-            sb.append(ANSI_CYAN)
-                    .append(String.format("%-20s", "LogEvent"))
-                    .append(ANSI_RESET);
+            sb.append(timestamp);
         }
+        sb.append(" ");
 
-        if (tag != null) {
+        String logLevel = LOG_LEVEL_MAP.getOrDefault(tag.toLowerCase(), "INFO");
+        if (supportsAnsiColors()) {
+            String levelColor = LOG_LEVEL_COLORS.getOrDefault(tag.toLowerCase(), ANSI_GREEN);
+            sb.append(levelColor)
+                    .append(String.format("%-5s", logLevel))
+                    .append(ANSI_RESET);
+        } else {
+            sb.append(String.format("%-5s", logLevel));
+        }
+        sb.append(" ");
+
+        if (supportsAnsiColors()) {
+            sb.append(ANSI_FAINT)
+                    .append("---")
+                    .append(ANSI_RESET);
+        } else {
+            sb.append("---");
+        }
+        sb.append(" ");
+
+        String loggerName = getLoggerName();
+        if (supportsAnsiColors()) {
             sb.append(ANSI_BLUE)
-                    .append(" [")
-                    .append(tag.toUpperCase())
-                    .append("]")
+                    .append(loggerName)
                     .append(ANSI_RESET);
+        } else {
+            sb.append(loggerName);
         }
 
-        sb.append(ANSI_FAINT)
-                .append(" : ")
-                .append(ANSI_RESET);
+        if (supportsAnsiColors()) {
+            sb.append(ANSI_FAINT)
+                    .append(" : ")
+                    .append(ANSI_RESET);
+        } else {
+            sb.append(" : ");
+        }
 
         p.print(sb.toString());
         return "";
+    }
+
+    private String getLoggerName() {
+        if (source != null) {
+            String className = source.getClass().getName();
+
+            if (className.length() > 36) {
+                String[] parts = className.split("\\.");
+                StringBuilder shortened = new StringBuilder();
+
+                for (int i = 0; i < parts.length - 1; i++) {
+                    if (i > 0)
+                        shortened.append(".");
+                    shortened.append(parts[i].charAt(0));
+                }
+
+                if (parts.length > 0) {
+                    shortened.append(".").append(parts[parts.length - 1]);
+                }
+
+                String result = shortened.toString();
+                if (result.length() > 36) {
+                    return result.substring(0, 36);
+                }
+                return result;
+            }
+
+            return className;
+        } else {
+            return "org.jpos.util.LogEvent";
+        }
     }
 
     private String dumpOriginalHeader(PrintStream p, String indent) {
@@ -227,7 +238,7 @@ public class LogEvent {
         sb.append("<log realm=\"")
                 .append(getRealm())
                 .append("\" at=\"")
-                .append(UTC_FORMATTER.format(dumpedAt))
+                .append(LOGBACK_FORMATTER.format(dumpedAt))
                 .append("\"");
 
         long elapsed = Duration.between(createdAt, dumpedAt).toMillis();
@@ -237,75 +248,74 @@ public class LogEvent {
                     .append("ms\"");
         }
 
-        // if (traceId != null) {
-        // sb.append(String.format(" trace-id=\"%s\"", traceId));
-        // }
-
         sb.append(">");
         p.println(sb.toString());
         return indent + "  ";
     }
 
-    private void dumpSpringStyle(PrintStream p, String indent) {
+    private void dumpLogbackStyle(PrintStream p, String indent) {
         if (payLoad.isEmpty()) {
-            if (tag != null && !tag.isEmpty()) {
-                p.println(ANSI_WHITE + "No message" + ANSI_RESET);
-            }
+            p.println("No messages");
         } else {
             synchronized (payLoad) {
                 boolean firstMessage = true;
                 for (Object o : payLoad) {
                     if (!firstMessage) {
                         p.println();
-                        dumpSpringStyleHeader(p, "");
+                        dumpLogbackStyleHeader(p, "");
                     }
 
                     if (o instanceof Loggeable) {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         PrintStream tempPs = new PrintStream(baos);
                         ((Loggeable) o).dump(tempPs, "");
-                        p.print(ANSI_WHITE + baos.toString().trim() + ANSI_RESET);
+                        p.print(baos.toString().trim());
                     } else if (o instanceof SQLException) {
                         SQLException e = (SQLException) o;
-                        p.print(ANSI_RED + "SQLException: " + e.getMessage() +
+                        p.print("SQLException: " + e.getMessage() +
                                 " (SQLState: " + e.getSQLState() +
-                                ", ErrorCode: " + e.getErrorCode() + ")" + ANSI_RESET);
-                        if (hasException) {
-                            p.println();
-                            e.printStackTrace(p);
-                        }
+                                ", ErrorCode: " + e.getErrorCode() + ")");
                     } else if (o instanceof Throwable) {
                         Throwable t = (Throwable) o;
-                        p.print(ANSI_RED + "Exception: " + t.getMessage() + ANSI_RESET);
-                        p.println();
-                        t.printStackTrace(p);
+                        p.print("Exception: " + t.getMessage());
                     } else if (o instanceof Object[]) {
                         Object[] oa = (Object[]) o;
-                        p.print(ANSI_WHITE + "Array: [");
+                        p.print("Array: [");
                         for (int j = 0; j < oa.length; j++) {
                             if (j > 0)
                                 p.print(", ");
                             p.print(oa[j] != null ? oa[j].toString() : "null");
                         }
-                        p.print("]" + ANSI_RESET);
+                        p.print("]");
                     } else if (o instanceof Element) {
-                        p.print(ANSI_WHITE + "XML Element: ");
+                        p.print("XML Element: ");
                         XMLOutputter out = new XMLOutputter(Format.getCompactFormat());
                         try {
                             out.output((Element) o, p);
                         } catch (IOException ex) {
                             p.print("Error outputting XML: " + ex.getMessage());
                         }
-                        p.print(ANSI_RESET);
                     } else if (o != null) {
-                        p.print(ANSI_WHITE + o.toString() + ANSI_RESET);
+                        p.print(o.toString());
                     } else {
-                        p.print(ANSI_WHITE + "null" + ANSI_RESET);
+                        p.print("null");
                     }
 
                     firstMessage = false;
                 }
-                p.println();
+
+                synchronized (payLoad) {
+                    for (Object o : payLoad) {
+                        if (o instanceof Throwable) {
+                            p.println();
+                            ((Throwable) o).printStackTrace(p);
+                        }
+                    }
+                }
+
+                if (!hasException) {
+                    p.println();
+                }
             }
         }
     }
@@ -384,7 +394,7 @@ public class LogEvent {
             String indent = dumpHeader(p, outer);
 
             if (springStyleLogging) {
-                dumpSpringStyle(p, indent);
+                dumpLogbackStyle(p, indent);
             } else {
                 dumpOriginalStyle(p, indent);
             }

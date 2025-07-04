@@ -1,41 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Register custom converter -->
-    <conversionRule conversionWord="ansi" converterClass="org.jpos.logging.CustomAnsiConverter"/>
 
-    <!-- Console appender với custom ANSI converter -->
+    <property name="LOG_PATH" value="log"/>
+    <property name="LOG_FILE" value="${LOG_PATH}/q2.log"/>
+
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%ansi{faint}%d{yyyy-MM-dd HH:mm:ss.SSS} %ansi{reset} %highlight(%-5level){ DEBUG=cyan, INFO=green, WARN=yellow, ERROR=red} %ansi{cyan}---%ansi{reset} %ansi{magenta}[%thread]%ansi{reset} %ansi{blue}%logger{36}%ansi{reset} %ansi{faint}: %msg%n%throwable</pattern>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr(---){faint} %clr(%logger{36}){blue} %clr(:){faint} %m%n%wEx</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <!-- Console appender với màu logback thông thường (đơn giản hơn) -->
-    <appender name="CONSOLE_SIMPLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%ansi{faint}%d{yyyy-MM-dd HH:mm:ss.SSS, UTC}%ansi{reset} %highlight(%-5level){TRACE=%ansi{blue}, DEBUG=%ansi{cyan}, INFO=%ansi{green}, WARN=%ansi{yellow}, ERROR=%ansi{red}} %ansi{cyan}--- %logger{36}%ansi{reset} %ansi{faint}[%thread]%ansi{reset} %ansi{cyan}:%ansi{reset} %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <!-- File appender (không có màu) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/q2.log</file>
+        <file>${LOG_FILE}</file>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, UTC} %-5level --- %logger{36} [%thread] : %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- %logger{36} : %msg%n%throwable</pattern>
+            <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>log/q2.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/q2.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     </appender>
 
-    <!-- Logger configurations -->
-    <logger name="ServerChannel" level="INFO"/>
-    <logger name="RCV" level="INFO"/>
+    <logger name="org.jpos" level="DEBUG"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
-
 </configuration>

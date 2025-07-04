@@ -1,0 +1,185 @@
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : ================ ISO Message =================
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Direction = [incoming]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Packager  = [napas.xml]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Header    = [6000030000]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : MTI       = [0200]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 2   = [________________]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 3   = [000000]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 4   = [000000010000]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 7   = [0704230830]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 11  = [123456]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 12  = [153045]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 13  = [0701]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 14  = [____]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 32  = [970426]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 37  = [123456789012]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 41  = [TERMID01]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : Field 49  = [704]
+2025-07-04 23:08:30.738 INFO  --- org.jpos.server.ServerChannel : ================ End of ISO Message ==========
+2025-07-04 23:08:30.779 ERROR --- o.j.t.participant.SelectDestination : Invalid card in request:
+
+org.jpos.core.InvalidCardException: invalid LUHN
+	at org.jpos.core.DefaultCardValidator.validate(DefaultCardValidator.java:66)
+	at org.jpos.core.Card$Builder.build(Card.java:236)
+	at org.jpos.transaction.participant.SelectDestination.prepare(SelectDestination.java:43)
+	at org.jpos.transaction.TransactionManager.prepare(TransactionManager.java:519)
+	at org.jpos.transaction.TransactionManager.prepareOrAbort(TransactionManager.java:1203)
+	at org.jpos.transaction.TransactionManager.prepare(TransactionManager.java:603)
+	at org.jpos.transaction.TransactionManager.runTransaction(TransactionManager.java:269)
+	at org.jpos.transaction.TransactionManager.lambda$run$0(TransactionManager.java:221)
+	at java.base/java.util.concurrent.ThreadPerTaskExecutor$TaskRunner.run(ThreadPerTaskExecutor.java:314)
+	at java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
+
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log : Txn[name=paticipant, id=1]
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.CheckFields PREPARED READONLY NO_JOIN
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.SelectDestination ABORTED READONLY NO_JOIN
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log : prepareForAbort: o.j.t.p.SendResponse
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log :           abort: o.j.t.p.SendResponse
+2025-07-04 23:08:30.826 INFO  --- org.jpos.util.Log :  in-transit=0, head=2, tail=2, paused=0, outstanding=0, active-sessions=1/1000, tps=0, peak=0, avg=0.00, elapsed=73ms
+2025-07-04 23:08:35.110 INFO  --- org.jpos.server.ServerChannel : No messages
+2025-07-04 23:08:35.113 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=1, permits=1000, info=]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : ================ ISO Message =================
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Direction = [incoming]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Packager  = [napas.xml]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Header    = [6000030000]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : MTI       = [0200]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 2   = [________________]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 3   = [000000]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 4   = [000000010000]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 7   = [0704230842]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 11  = [123456]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 12  = [153045]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 13  = [0701]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 14  = [____]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 32  = [970426]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 37  = [123456789012]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 41  = [TERMID01]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : Field 49  = [704]
+2025-07-04 23:08:42.190 INFO  --- org.jpos.server.ServerChannel : ================ End of ISO Message ==========
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : ================ ISO Message =================
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Direction = [outgoing]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Packager  = [napas.xml]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Header    = [6000030000]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : MTI       = [0200]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 2   = [________________]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 3   = [000000]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 4   = [000000010000]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 7   = [0704230842]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 11  = [123456]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 12  = [153045]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 13  = [0701]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 14  = [____]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 32  = [970426]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 37  = [123456789012]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 41  = [TERMID01]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 49  = [704]
+2025-07-04 23:08:42.230 INFO  --- org.jpos.channel.vcb.VCBChannel : ================ End of ISO Message ==========
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : ================ ISO Message =================
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Direction = [incoming]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Packager  = [napas.xml]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Header    = [6000000003]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : MTI       = [0200]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 2   = [________________]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 3   = [000000]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 4   = [000000010000]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 7   = [0704230842]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 11  = [123456]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 12  = [153045]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 13  = [0701]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 14  = [____]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 32  = [970426]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 37  = [123456789012]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 41  = [TERMID01]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : Field 49  = [704]
+2025-07-04 23:08:42.241 INFO  --- o.j.c.v.VCBChannelSimulate : ================ End of ISO Message ==========
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : ================ ISO Message =================
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Direction = [outgoing]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Packager  = [napas.xml]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Header    = [6000000003]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : MTI       = [0210]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 2   = [________________]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 3   = [000000]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 4   = [000000010000]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 7   = [0704230842]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 11  = [123456]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 12  = [153045]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 13  = [0701]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 14  = [____]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 32  = [970426]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 37  = [123456789012]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 39  = [00]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 41  = [TERMID01]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : Field 49  = [704]
+2025-07-04 23:08:42.338 INFO  --- o.j.c.v.VCBChannelSimulate : ================ End of ISO Message ==========
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : ================ ISO Message =================
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Direction = [incoming]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Packager  = [napas.xml]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Header    = [6000030000]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : MTI       = [0210]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 2   = [________________]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 3   = [000000]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 4   = [000000010000]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 7   = [0704230842]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 11  = [123456]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 12  = [153045]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 13  = [0701]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 14  = [____]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 32  = [970426]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 37  = [123456789012]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 39  = [000]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 41  = [TERMID01]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : Field 49  = [704]
+2025-07-04 23:08:42.345 INFO  --- org.jpos.channel.vcb.VCBChannel : ================ End of ISO Message ==========
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : ================ ISO Message =================
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Direction = [outgoing]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Packager  = [napas.xml]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Header    = [6000030000]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : MTI       = [0210]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 2   = [________________]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 3   = [000000]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 4   = [000000010000]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 7   = [0704230842]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 11  = [123456]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 12  = [153045]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 13  = [0701]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 14  = [____]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 32  = [970426]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 37  = [123456789012]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 39  = [000]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 41  = [TERMID01]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 42  = [MERCHID000001  ]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : Field 49  = [704]
+2025-07-04 23:08:42.371 INFO  --- org.jpos.server.ServerChannel : ================ End of ISO Message ==========
+2025-07-04 23:08:42.376 INFO  --- org.jpos.server.ServerChannel : No messages
+2025-07-04 23:08:42.377 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=2, permits=1000, info=]
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log : Txn[name=paticipant, id=2]
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.CheckFields PREPARED READONLY NO_JOIN
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.SelectDestination PREPARED READONLY NO_JOIN
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.QueryHost PREPARED READONLY NO_JOIN
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.Transaction PREPARED READONLY NO_JOIN
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :         prepare: o.j.t.p.SendResponse PREPARED READONLY
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :          commit: o.j.t.p.SendResponse
+2025-07-04 23:08:42.379 INFO  --- org.jpos.util.Log :  in-transit=0, head=3, tail=3, paused=0, outstanding=0, active-sessions=1/1000, tps=0, peak=1, avg=0.07, elapsed=81ms
+2025-07-04 23:09:27.300 INFO  --- o.j.c.v.VCBChannelSimulate : No messages
+2025-07-04 23:09:27.300 INFO  --- org.jpos.channel.tcb.TCBChannel : No messages
+2025-07-04 23:09:27.301 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=1, permits=100, info=]
+2025-07-04 23:09:27.302 INFO  --- org.jpos.channel.tcb.TCBChannel : Connect{host='127.0.0.1', remotePort=8001, localPort=43498}
+2025-07-04 23:09:27.306 INFO  --- org.jpos.channel.tpb.TPBChannel : No messages
+2025-07-04 23:09:27.306 INFO  --- o.j.c.t.TPBChannelSimulate : No messages
+2025-07-04 23:09:27.307 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=1, permits=100, info=]
+2025-07-04 23:09:27.328 INFO  --- org.jpos.channel.vib.VIBChannel : No messages
+2025-07-04 23:09:27.328 INFO  --- o.j.c.v.VIBChannelSimulate : No messages
+2025-07-04 23:09:27.328 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=1, permits=100, info=]
+2025-07-04 23:09:37.310 INFO  --- org.jpos.channel.tpb.TPBChannel : Connect{host='127.0.0.1', remotePort=8000, localPort=42988}
+2025-07-04 23:09:37.332 INFO  --- org.jpos.channel.vib.VIBChannel : Connect{host='127.0.0.1', remotePort=8003, localPort=37304}
+2025-07-04 23:09:42.351 INFO  --- org.jpos.channel.vcb.VCBChannel : No messages
+2025-07-04 23:09:42.352 INFO  --- o.j.c.v.VCBChannelSimulate : No messages
+2025-07-04 23:09:42.352 INFO  --- org.jpos.iso.ISOServer$Session : SessionEnd[connections=1, permits=100, info=]
+2025-07-04 23:09:45.080 INFO  --- org.jpos.util.Log : Shutdown[id=cdf9f66c-ee4b-4358-ba59-46ce7f396acc, delay=0]
+2025-07-04 23:09:45.082 INFO  --- org.jpos.util.Log : Stop[id=cdf9f66c-ee4b-4358-ba59-46ce7f396acc, uptime=PT1M21.935289636S]
