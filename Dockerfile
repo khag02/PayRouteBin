@@ -1,7 +1,7 @@
 FROM gradle:8.12-jdk23-alpine AS build
 
-WORKDIR /demo
+WORKDIR /PayRouteBin
 COPY . .
 RUN gradle installApp
 
-CMD ["sh", "build/install/demo/bin/q2"]
+CMD ["sh", "build/install/PayRouteBin/bin/q2"]

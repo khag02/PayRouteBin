@@ -1,3 +1,3 @@
 #!/bin/bash
 gradle installApp
-build/install/demo/bin/q2
+build/install/PayRouteBin/bin/q2
