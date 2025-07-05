@@ -1,0 +1,16 @@
+services:
+  demo:
+    image: demo
+    # build:
+    # context: .
+    container_name: demo
+    volumes:
+      - ./khang/demo:/app
+    networks:
+      - demo
+    ports:
+      - "9999:9999"
+
+networks:
+  demo:
+    driver: bridge
