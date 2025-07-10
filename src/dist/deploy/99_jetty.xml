@@ -1,0 +1,4 @@
+<jetty-service class="org.jpos.server.JettyService" logger="Q2">
+    <property name="port" value="8087" />
+    <property name="contextPath" value="/api" />
+</jetty-service>

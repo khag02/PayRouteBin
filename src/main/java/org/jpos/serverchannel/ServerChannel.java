@@ -1,4 +1,4 @@
-package org.jpos.server;
+package org.jpos.serverchannel;
 
 import java.io.IOException;
 import java.net.ServerSocket;
